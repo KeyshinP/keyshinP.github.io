@@ -1,0 +1,68 @@
+---
+---
+
+<script is:inline>
+  function setupCodeCopyButtons() {
+    const preBlocks = document.querySelectorAll('pre');
+    
+    preBlocks.forEach((pre) => {
+      // Avoid duplicate buttons
+      if (pre.parentElement && pre.parentElement.classList.contains('code-wrapper')) {
+        return;
+      }
+
+      // Create wrapper
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-wrapper';
+      pre.parentNode.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+
+      // Create copy button
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'copy-btn';
+      copyBtn.setAttribute('aria-label', '复制代码');
+      copyBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+        <span>复制</span>
+      `;
+
+      copyBtn.addEventListener('click', async () => {
+        const code = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+        try {
+          await navigator.clipboard.writeText(code);
+          copyBtn.classList.add('copied');
+          copyBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>已复制</span>
+          `;
+          setTimeout(() => {
+            copyBtn.classList.remove('copied');
+            copyBtn.innerHTML = `
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span>复制</span>
+            `;
+          }, 2000);
+        } catch (err) {
+          console.error('复制失败:', err);
+        }
+      });
+
+      wrapper.appendChild(copyBtn);
+    });
+  }
+
+  // Run on load and dynamic page changes
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupCodeCopyButtons);
+  } else {
+    setupCodeCopyButtons();
+  }
+</script>

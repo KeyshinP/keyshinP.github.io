@@ -1,0 +1,54 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-left">
+      <span>© {currentYear} Keyshin. All rights reserved.</span>
+    </div>
+    <div class="footer-right">
+      <span>Powered by <a href="https://astro.build" target="_blank" rel="noopener noreferrer">Astro</a> · Deployed on GitHub Pages</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: auto;
+    width: 100%;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+    padding: 2rem 1.5rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+  }
+
+  .footer-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-right a {
+    color: var(--text-secondary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .footer-right a:hover {
+    color: var(--accent);
+  }
+
+  @media (max-width: 640px) {
+    .footer-container {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+</style>

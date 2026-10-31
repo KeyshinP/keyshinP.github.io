@@ -1,0 +1,65 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ProgressBar from '../components/ProgressBar.astro';
+import CodeCopy from '../components/CodeCopy.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  showProgress?: boolean;
+}
+
+const { 
+  title = "Keyshin's Blog", 
+  description = "Flash游戏逆向、爬虫与系统工程笔记",
+  showProgress = false 
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/avatar.png" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    
+    <!-- Theme initialiser script (Prevents flash) -->
+    <script is:inline>
+      const theme = (() => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme');
+        }
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          return 'dark';
+        }
+        return 'light';
+      })();
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
+  </head>
+  <body>
+    {showProgress && <ProgressBar />}
+    <Header />
+    <main class="page-main">
+      <slot />
+    </main>
+    <Footer />
+    <CodeCopy />
+  </body>
+</html>
+
+<style>
+  .page-main {
+    flex: 1;
+    width: 100%;
+  }
+</style>

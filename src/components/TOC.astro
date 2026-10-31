@@ -1,0 +1,158 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{toc.length > 0 && (
+  <nav class="toc-sidebar" aria-label="文章目录">
+    <div class="toc-card">
+      <div class="toc-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        <span>目录导航</span>
+      </div>
+      <ul class="toc-list">
+        {toc.map((heading) => (
+          <li class={`toc-item depth-${heading.depth}`}>
+            <a href={`#${heading.slug}`} class="toc-link" data-slug={heading.slug}>
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </nav>
+)}
+
+<style>
+  .toc-sidebar {
+    position: sticky;
+    top: 5rem;
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+    width: 260px;
+    flex-shrink: 0;
+  }
+
+  .toc-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.25rem 1rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .toc-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .toc-item {
+    margin: 0.35rem 0;
+    line-height: 1.4;
+  }
+
+  .toc-item.depth-3 {
+    padding-left: 0.85rem;
+  }
+
+  .toc-link {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    display: block;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    border-left: 2px solid transparent;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .toc-link:hover {
+    color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .toc-link.active {
+    color: var(--accent);
+    font-weight: 600;
+    border-left-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  @media (max-width: 1024px) {
+    .toc-sidebar {
+      display: none;
+    }
+  }
+</style>
+
+<script is:inline>
+  function setupTocScrollspy() {
+    const links = document.querySelectorAll('.toc-link');
+    if (!links.length) return;
+
+    const headings = Array.from(links).map((link) => {
+      const slug = link.getAttribute('data-slug');
+      return document.getElementById(slug);
+    }).filter(Boolean);
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id');
+          links.forEach((link) => {
+            if (link.getAttribute('data-slug') === id) {
+              link.classList.add('active');
+            } else {
+              link.classList.remove('active');
+            }
+          });
+        }
+      });
+    }, {
+      rootMargin: '0px 0px -70% 0px',
+      threshold: 0.1
+    });
+
+    headings.forEach((h) => observer.observe(h));
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupTocScrollspy);
+  } else {
+    setupTocScrollspy();
+  }
+</script>
