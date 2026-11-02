@@ -2,22 +2,31 @@
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TOC from '../../components/TOC.astro';
+import { getReadingStats } from '../../utils/readingTime';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
-  return posts.map((post) => ({
+  posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+  return posts.map((post, index) => ({
     params: { slug: post.id },
-    props: { post },
+    props: { 
+      post,
+      prevPost: index < posts.length - 1 ? posts[index + 1] : null,
+      nextPost: index > 0 ? posts[index - 1] : null,
+    },
   }));
 }
 
-const { post } = Astro.props;
+const { post, prevPost, nextPost } = Astro.props;
 const { Content, headings } = await render(post);
+const stats = getReadingStats(post.body || '');
 ---
 
 <BaseLayout 
   title={`${post.data.title} - Keyshin`} 
   description={post.data.description}
+  article={true}
   showProgress={true}
 >
   <div class="article-container">
@@ -52,12 +61,28 @@ const { Content, headings } = await render(post);
               </svg>
               <span>{post.data.author}</span>
             </span>
+            <span class="meta-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span>约 {stats.wordCount} 字</span>
+            </span>
+            <span class="meta-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span>预计阅读 {stats.readingTime} 分钟</span>
+            </span>
           </div>
 
           {post.data.tags && post.data.tags.length > 0 && (
             <div class="tag-list">
               {post.data.tags.map((tag: string) => (
-                <span class="tag-badge">#{tag}</span>
+                <a href={`/tags/${encodeURIComponent(tag)}/`} class="tag-badge">#{tag}</a>
               ))}
             </div>
           )}
@@ -66,6 +91,28 @@ const { Content, headings } = await render(post);
         <div class="markdown-body">
           <Content />
         </div>
+
+        <!-- Post Nav: Prev & Next -->
+        {(prevPost || nextPost) && (
+          <nav class="post-navigation">
+            {prevPost ? (
+              <a href={`/posts/${prevPost.id}/`} class="nav-card prev-card">
+                <span class="nav-dir">← 上一篇</span>
+                <span class="nav-title">{prevPost.data.title}</span>
+              </a>
+            ) : (
+              <div class="nav-card-empty"></div>
+            )}
+            {nextPost ? (
+              <a href={`/posts/${nextPost.id}/`} class="nav-card next-card">
+                <span class="nav-dir">下一篇 →</span>
+                <span class="nav-title">{nextPost.data.title}</span>
+              </a>
+            ) : (
+              <div class="nav-card-empty"></div>
+            )}
+          </nav>
+        )}
       </article>
 
       <TOC headings={headings} />
@@ -124,7 +171,7 @@ const { Content, headings } = await render(post);
     display: flex;
     flex-wrap: wrap;
     gap: 1.25rem;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     color: var(--text-muted);
     margin-bottom: 1rem;
   }
@@ -149,5 +196,73 @@ const { Content, headings } = await render(post);
     background: var(--accent-light);
     padding: 0.2rem 0.6rem;
     border-radius: 9999px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .tag-badge:hover {
+    background: var(--accent);
+    color: #ffffff;
+  }
+
+  .post-navigation {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .nav-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1.25rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+  }
+
+  .nav-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .next-card {
+    text-align: right;
+  }
+
+  .nav-dir {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .nav-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .nav-card:hover .nav-title {
+    color: var(--accent);
+  }
+
+  .nav-card-empty {
+    visibility: hidden;
+  }
+
+  @media (max-width: 640px) {
+    .post-navigation {
+      grid-template-columns: 1fr;
+    }
+    .next-card {
+      text-align: left;
+    }
   }
 </style>

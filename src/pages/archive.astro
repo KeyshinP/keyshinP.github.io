@@ -1,0 +1,188 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog');
+posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Group posts by year
+const postsByYear = posts.reduce((acc, post) => {
+  const year = post.data.date.getFullYear().toString();
+  if (!acc[year]) {
+    acc[year] = [];
+  }
+  acc[year].push(post);
+  return acc;
+}, {} as Record<string, typeof posts>);
+
+const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
+---
+
+<BaseLayout title="文章归档 - Keyshin" description="Keyshin 博客文章按时间线完整归档">
+  <div class="archive-container">
+    <header class="archive-header">
+      <h1 class="page-title">文章归档</h1>
+      <p class="page-subtitle">按时间线梳理的完整工程思考与技术记录，共 {posts.length} 篇文章</p>
+    </header>
+
+    <div class="timeline">
+      {years.map((year) => (
+        <section class="year-section">
+          <div class="year-marker">
+            <span class="year-number">{year}</span>
+            <span class="year-count">{postsByYear[year].length} 篇</span>
+          </div>
+
+          <div class="year-posts">
+            {postsByYear[year].map((post) => {
+              const monthDay = post.data.date.toISOString().slice(5, 10);
+              return (
+                <article class="timeline-item">
+                  <span class="item-date">{monthDay}</span>
+                  <a href={`/posts/${post.id}/`} class="item-link">
+                    <span class="item-title">{post.data.title}</span>
+                  </a>
+                  {post.data.tags && post.data.tags.length > 0 && (
+                    <div class="item-tags">
+                      {post.data.tags.slice(0, 3).map((tag: string) => (
+                        <a href={`/tags/${encodeURIComponent(tag)}/`} class="item-tag">#{tag}</a>
+                      ))}
+                    </div>
+                  )}
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .archive-container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 6rem;
+  }
+
+  .archive-header {
+    margin-bottom: 3.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .page-title {
+    margin-bottom: 0.75rem;
+  }
+
+  .page-subtitle {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+  }
+
+  .timeline {
+    position: relative;
+    padding-left: 1rem;
+    border-left: 2px solid var(--border-color);
+  }
+
+  .year-section {
+    position: relative;
+    margin-bottom: 3.5rem;
+  }
+
+  .year-marker {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .year-marker::before {
+    content: '';
+    position: absolute;
+    left: calc(-1rem - 5px);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg-primary);
+  }
+
+  .year-number {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+  }
+
+  .year-count {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .year-posts {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .timeline-item {
+    display: flex;
+    align-items: baseline;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    padding-left: 0.5rem;
+  }
+
+  .item-date {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    min-width: 50px;
+  }
+
+  .item-link {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .item-link:hover {
+    color: var(--accent);
+  }
+
+  .item-tags {
+    display: flex;
+    gap: 0.35rem;
+    margin-left: auto;
+  }
+
+  .item-tag {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    background: var(--bg-secondary);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    transition: all 0.15s ease;
+  }
+
+  .item-tag:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  @media (max-width: 640px) {
+    .item-tags {
+      width: 100%;
+      margin-left: 60px;
+    }
+  }
+</style>
