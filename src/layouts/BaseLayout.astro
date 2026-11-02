@@ -1,11 +1,15 @@
 ---
 import '../styles/global.css';
+import 'katex/dist/katex.min.css';
+import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import ProgressBar from '../components/ProgressBar.astro';
 import CodeCopy from '../components/CodeCopy.astro';
 import SearchModal from '../components/SearchModal.astro';
 import ImageLightbox from '../components/ImageLightbox.astro';
+import Mermaid from '../components/Mermaid.astro';
+import Analytics from '../components/Analytics.astro';
 
 interface Props {
   title?: string;
@@ -50,28 +54,35 @@ const imageURL = new URL(image, Astro.site || 'https://keyshinp.github.io');
     <meta property="og:locale" content="zh_CN" />
 
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content={canonicalURL} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={imageURL} />
+
+    <!-- Astro View Transitions -->
+    <ClientRouter />
     
-    <!-- Theme initialiser script (Prevents flash) -->
+    <!-- Theme initialiser script (Prevents flash across page loads) -->
     <script is:inline>
-      const theme = (() => {
-        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-          return localStorage.getItem('theme');
+      function applyTheme() {
+        const theme = (() => {
+          if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+            return localStorage.getItem('theme');
+          }
+          if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark';
+          }
+          return 'light';
+        })();
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
         }
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          return 'dark';
-        }
-        return 'light';
-      })();
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
       }
+      applyTheme();
+      document.addEventListener('astro:after-swap', applyTheme);
     </script>
   </head>
   <body>
@@ -84,6 +95,8 @@ const imageURL = new URL(image, Astro.site || 'https://keyshinp.github.io');
     <CodeCopy />
     <SearchModal />
     <ImageLightbox />
+    <Mermaid />
+    <Analytics />
   </body>
 </html>
 

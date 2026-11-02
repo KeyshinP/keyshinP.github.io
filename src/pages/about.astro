@@ -1,0 +1,354 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="关于我 - Keyshin" description="Keyshin 的个人背景、技术技能矩阵与工程沉淀">
+  <div class="about-container">
+    <!-- Profile Header -->
+    <header class="about-header">
+      <div class="profile-hero">
+        <img src="/avatar.png" alt="Keyshin Avatar" class="profile-avatar" />
+        <div class="profile-intro">
+          <h1 class="profile-name">Keyshin</h1>
+          <p class="profile-handle">@KeyshinP / Zeyxin</p>
+          <p class="profile-bio">专注 Flash 游戏逆向工程、网络爬虫系统开发与系统级技术文档沉淀。</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="about-content">
+      <!-- Section 1: Overview -->
+      <section class="about-section">
+        <h2 class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>关于本人</span>
+        </h2>
+        <p>
+          热爱底层协议分析、数据还原与自动化工程。常年从事针对下线服务、旧时代数字遗产（如早年官方 Flash 游戏）的离线重构与逆向归档，以及高对抗场景下的爬虫与数据提取。
+        </p>
+        <p>
+          崇尚实事求是的工程思维，注重技术推导证据链与可复现的代码落盘。
+        </p>
+      </section>
+
+      <!-- Section 2: Skills Matrix -->
+      <section class="about-section">
+        <h2 class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"></polyline>
+            <polyline points="8 6 2 12 8 18"></polyline>
+          </svg>
+          <span>技能矩阵与工具链</span>
+        </h2>
+        
+        <div class="skills-grid">
+          <div class="skill-card">
+            <h3 class="skill-card-title">逆向工程与数据还原</h3>
+            <ul class="skill-list">
+              <li><strong>Flash / SWF 逆向</strong>：ActionScript 2/3、JPEXS FFDec、SWF 二进制解压与常量扫描</li>
+              <li><strong>协议抓包与分析</strong>：Wireshark、Fiddler、Charles、浏览器 Network 动态依赖重构</li>
+              <li><strong>二进制调试</strong>：Ghidra、IDA Pro、x64dbg 基础分析</li>
+            </ul>
+          </div>
+
+          <div class="skill-card">
+            <h3 class="skill-card-title">爬虫与自动化工程</h3>
+            <ul class="skill-list">
+              <li><strong>核心语言</strong>：Python、TypeScript、Node.js、PowerShell / Bash</li>
+              <li><strong>爬虫架构</strong>：Scrapy、Asyncio、Playwright、Selenium、反爬签名逆向</li>
+              <li><strong>数据存储与处理</strong>：PostgreSQL、Redis、JSON Lines、Pandas</li>
+            </ul>
+          </div>
+
+          <div class="skill-card">
+            <h3 class="skill-card-title">系统架构与工程化</h3>
+            <ul class="skill-list">
+              <li><strong>静态站点与前端</strong>：Astro 7、Vite、Shiki、Web Components</li>
+              <li><strong>DevOps & CI/CD</strong>：GitHub Actions 自动化流水线、Docker 容器化部署</li>
+              <li><strong>环境与调优</strong>：Linux / Windows 混合环境系统级调试与脚本编写</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Key Projects -->
+      <section class="about-section">
+        <h2 class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          <span>代表性成果与项目</span>
+        </h2>
+        
+        <div class="project-list">
+          <div class="project-item">
+            <div class="project-item-header">
+              <h3 class="project-item-title">名侦探柯南（2008年）官方 Flash 游戏完整离线逆向存档</h3>
+              <span class="project-tag">数据抢救 · 逆向工程</span>
+            </div>
+            <p class="project-item-desc">
+              在服务器已关闭且配套实体书绝版的情况下，通过 SWF 依赖解包、动态加载器重构、常量混淆穿透，完整抢救并还原了全部 84 道题库及核心游戏逻辑，使其在离线环境下完整可运行。
+            </p>
+            <div class="project-links">
+              <a href="/posts/flash-game-reverse/" class="project-link">查看复盘文档 →</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: Contact & Social -->
+      <section class="about-section">
+        <h2 class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          </svg>
+          <span>联络与外链</span>
+        </h2>
+        
+        <div class="contact-links">
+          <a href="https://github.com/KeyshinP" target="_blank" rel="noopener noreferrer" class="contact-card">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+            </svg>
+            <div>
+              <span class="contact-label">GitHub</span>
+              <span class="contact-value">KeyshinP</span>
+            </div>
+          </a>
+
+          <a href="mailto:siablack54@gmail.com" class="contact-card">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"></path>
+            </svg>
+            <div>
+              <span class="contact-label">Email</span>
+              <span class="contact-value">siablack54@gmail.com</span>
+            </div>
+          </a>
+
+          <a href="/rss.xml" class="contact-card">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 11a9 9 0 0 1 9 9"></path>
+              <path d="M4 4a16 16 0 0 1 16 16"></path>
+              <circle cx="5" cy="19" r="1"></circle>
+            </svg>
+            <div>
+              <span class="contact-label">RSS 订阅</span>
+              <span class="contact-value">rss.xml</span>
+            </div>
+          </a>
+        </div>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .about-container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 6rem;
+  }
+
+  .about-header {
+    margin-bottom: 3.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .profile-hero {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .profile-avatar {
+    width: 108px;
+    height: 108px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--accent);
+    box-shadow: var(--shadow-md);
+    flex-shrink: 0;
+  }
+
+  .profile-name {
+    font-size: 2.25rem;
+    font-weight: 800;
+    margin: 0 0 0.25rem;
+  }
+
+  .profile-handle {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  .profile-bio {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .about-section {
+    margin-bottom: 3.5rem;
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0 0 1.25rem;
+    color: var(--text-primary);
+  }
+
+  .section-title svg {
+    color: var(--accent);
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .skill-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .skill-card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.75rem;
+  }
+
+  .skill-list {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: var(--text-secondary);
+    font-size: 0.925rem;
+  }
+
+  .skill-list li {
+    margin-bottom: 0.4rem;
+    line-height: 1.6;
+  }
+
+  .project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .project-item {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .project-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .project-item-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+  }
+
+  .project-tag {
+    font-size: 0.75rem;
+    background: var(--accent-light);
+    color: var(--accent);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .project-item-desc {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .project-link {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .contact-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+
+  .contact-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+  }
+
+  .contact-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .contact-card svg {
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .contact-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .contact-value {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 640px) {
+    .profile-hero {
+      flex-direction: column;
+      text-align: center;
+      gap: 1.25rem;
+    }
+  }
+</style>

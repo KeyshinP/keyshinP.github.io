@@ -150,9 +150,5 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
     headings.forEach((h) => observer.observe(h));
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupTocScrollspy);
-  } else {
-    setupTocScrollspy();
-  }
+  document.addEventListener('astro:page-load', setupTocScrollspy);
 </script>

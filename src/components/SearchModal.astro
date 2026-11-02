@@ -198,11 +198,6 @@
     let indexData = null;
     let selectedIndex = -1;
 
-    const modal = document.getElementById('search-modal');
-    const input = document.getElementById('search-input');
-    const resultsContainer = document.getElementById('search-results');
-    const closeBtn = document.getElementById('search-close-btn');
-
     async function loadIndex() {
       if (indexData) return;
       try {
@@ -213,123 +208,137 @@
       }
     }
 
-    function openSearch() {
-      if (!modal) return;
-      modal.classList.add('open');
-      modal.setAttribute('aria-hidden', 'false');
-      loadIndex();
-      setTimeout(() => input?.focus(), 50);
-    }
+    function initSearch() {
+      const modal = document.getElementById('search-modal');
+      const input = document.getElementById('search-input');
+      const resultsContainer = document.getElementById('search-results');
+      const closeBtn = document.getElementById('search-close-btn');
 
-    function closeSearch() {
       if (!modal) return;
-      modal.classList.remove('open');
-      modal.setAttribute('aria-hidden', 'true');
-      if (input) input.value = '';
-      renderDefault();
-    }
 
-    function renderDefault() {
-      if (resultsContainer) {
-        resultsContainer.innerHTML = '<div class="search-hint">输入关键词开始检索...</div>';
+      function openSearch() {
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        loadIndex();
+        setTimeout(() => input?.focus(), 50);
       }
-      selectedIndex = -1;
-    }
 
-    function highlightMatch(text, query) {
-      if (!text) return '';
-      const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-      return text.replace(regex, '<mark style="background: rgba(37,99,235,0.2); color: inherit; padding: 0 2px; border-radius: 2px;">$1</mark>');
-    }
-
-    function performSearch(query) {
-      const q = query.trim().toLowerCase();
-      if (!q) {
+      function closeSearch() {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        if (input) input.value = '';
         renderDefault();
-        return;
       }
-      if (!indexData) return;
 
-      const filtered = indexData.filter((item) => {
-        const inTitle = item.title?.toLowerCase().includes(q);
-        const inDesc = item.description?.toLowerCase().includes(q);
-        const inTags = item.tags?.some((t) => t.toLowerCase().includes(q));
-        return inTitle || inDesc || inTags;
-      });
-
-      if (filtered.length === 0) {
-        resultsContainer.innerHTML = '<div class="search-hint">未找到匹配文章</div>';
+      function renderDefault() {
+        if (resultsContainer) {
+          resultsContainer.innerHTML = '<div class="search-hint">输入关键词开始检索...</div>';
+        }
         selectedIndex = -1;
-        return;
       }
 
-      resultsContainer.innerHTML = filtered.map((item, idx) => `
-        <a href="${item.url}" class="search-result-item ${idx === 0 ? 'selected' : ''}" data-idx="${idx}">
-          <div class="search-item-header">
-            <span class="search-item-title">${highlightMatch(item.title, q)}</span>
-            <span class="search-item-date">${item.date}</span>
-          </div>
-          ${item.description ? `<p class="search-item-desc">${highlightMatch(item.description, q)}</p>` : ''}
-          ${item.tags && item.tags.length ? `
-            <div class="search-item-tags">
-              ${item.tags.map(t => `<span class="search-item-tag">#${t}</span>`).join('')}
+      function highlightMatch(text, query) {
+        if (!text) return '';
+        const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        return text.replace(regex, '<mark style="background: rgba(37,99,235,0.2); color: inherit; padding: 0 2px; border-radius: 2px;">$1</mark>');
+      }
+
+      function performSearch(query) {
+        const q = query.trim().toLowerCase();
+        if (!q) {
+          renderDefault();
+          return;
+        }
+        if (!indexData) return;
+
+        const filtered = indexData.filter((item) => {
+          const inTitle = item.title?.toLowerCase().includes(q);
+          const inDesc = item.description?.toLowerCase().includes(q);
+          const inTags = item.tags?.some((t) => t.toLowerCase().includes(q));
+          return inTitle || inDesc || inTags;
+        });
+
+        if (filtered.length === 0) {
+          resultsContainer.innerHTML = '<div class="search-hint">未找到匹配文章</div>';
+          selectedIndex = -1;
+          return;
+        }
+
+        resultsContainer.innerHTML = filtered.map((item, idx) => `
+          <a href="${item.url}" class="search-result-item ${idx === 0 ? 'selected' : ''}" data-idx="${idx}">
+            <div class="search-item-header">
+              <span class="search-item-title">${highlightMatch(item.title, q)}</span>
+              <span class="search-item-date">${item.date}</span>
             </div>
-          ` : ''}
-        </a>
-      `).join('');
+            ${item.description ? `<p class="search-item-desc">${highlightMatch(item.description, q)}</p>` : ''}
+            ${item.tags && item.tags.length ? `
+              <div class="search-item-tags">
+                ${item.tags.map(t => `<span class="search-item-tag">#${t}</span>`).join('')}
+              </div>
+            ` : ''}
+          </a>
+        `).join('');
 
-      selectedIndex = 0;
-    }
-
-    // Event listeners
-    window.addEventListener('keydown', (e) => {
-      // Cmd/Ctrl + K or forward slash
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        modal?.classList.contains('open') ? closeSearch() : openSearch();
-      } else if (e.key === 'Escape' && modal?.classList.contains('open')) {
-        closeSearch();
-      } else if (modal?.classList.contains('open')) {
-        const items = resultsContainer.querySelectorAll('.search-result-item');
-        if (!items.length) return;
-
-        if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          selectedIndex = (selectedIndex + 1) % items.length;
-          updateSelected(items);
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          selectedIndex = (selectedIndex - 1 + items.length) % items.length;
-          updateSelected(items);
-        } else if (e.key === 'Enter' && selectedIndex >= 0 && items[selectedIndex]) {
-          e.preventDefault();
-          items[selectedIndex].click();
-        }
+        selectedIndex = 0;
       }
-    });
 
-    function updateSelected(items) {
-      items.forEach((item, idx) => {
-        if (idx === selectedIndex) {
-          item.classList.add('selected');
-          item.scrollIntoView({ block: 'nearest' });
-        } else {
-          item.classList.remove('selected');
-        }
-      });
+      function updateSelected(items) {
+        items.forEach((item, idx) => {
+          if (idx === selectedIndex) {
+            item.classList.add('selected');
+            item.scrollIntoView({ block: 'nearest' });
+          } else {
+            item.classList.remove('selected');
+          }
+        });
+      }
+
+      modal.onclick = (e) => {
+        if (e.target === modal) closeSearch();
+      };
+
+      if (closeBtn) closeBtn.onclick = closeSearch;
+
+      if (input) {
+        input.oninput = (e) => performSearch(e.target.value);
+      }
+
+      // Keydown listener
+      if (!window.__hasSearchKeydown) {
+        window.__hasSearchKeydown = true;
+        window.addEventListener('keydown', (e) => {
+          const m = document.getElementById('search-modal');
+          const r = document.getElementById('search-results');
+          if (!m) return;
+
+          if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            m.classList.contains('open') ? closeSearch() : openSearch();
+          } else if (e.key === 'Escape' && m.classList.contains('open')) {
+            closeSearch();
+          } else if (m.classList.contains('open') && r) {
+            const items = r.querySelectorAll('.search-result-item');
+            if (!items.length) return;
+
+            if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              selectedIndex = (selectedIndex + 1) % items.length;
+              updateSelected(items);
+            } else if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+              updateSelected(items);
+            } else if (e.key === 'Enter' && selectedIndex >= 0 && items[selectedIndex]) {
+              e.preventDefault();
+              items[selectedIndex].click();
+            }
+          }
+        });
+      }
+
+      window.openSearchModal = openSearch;
     }
 
-    modal?.addEventListener('click', (e) => {
-      if (e.target === modal) closeSearch();
-    });
-
-    closeBtn?.addEventListener('click', closeSearch);
-
-    input?.addEventListener('input', (e) => {
-      performSearch(e.target.value);
-    });
-
-    // Expose openSearch to header button
-    window.openSearchModal = openSearch;
+    document.addEventListener('astro:page-load', initSearch);
   })();
 </script>

@@ -1,0 +1,149 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = '' } = Astro.props;
+---
+
+<div class="share-toolbar">
+  <div class="toolbar-left">
+    <button id="share-btn" class="tool-btn" data-title={title} data-desc={description}>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="18" cy="5" r="3"></circle>
+        <circle cx="6" cy="12" r="3"></circle>
+        <circle cx="18" cy="19" r="3"></circle>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+      </svg>
+      <span class="tool-text">分享</span>
+    </button>
+
+    <button id="copy-link-btn" class="tool-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+      </svg>
+      <span class="tool-text">复制链接</span>
+    </button>
+  </div>
+
+  <div class="toolbar-right">
+    <button id="back-to-top-btn" class="tool-btn" aria-label="返回顶部">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="18 15 12 9 6 15"></polyline>
+      </svg>
+      <span class="tool-text">置顶</span>
+    </button>
+  </div>
+</div>
+
+<style>
+  .share-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 0;
+    margin-top: 2.5rem;
+    border-top: 1px dashed var(--border-color);
+    border-bottom: 1px dashed var(--border-color);
+  }
+
+  .toolbar-left, .toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .tool-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.85rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .tool-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .tool-btn.success {
+    background: #10b981;
+    color: #ffffff;
+    border-color: #10b981;
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    function initShareToolbar() {
+      const shareBtn = document.getElementById('share-btn');
+      const copyLinkBtn = document.getElementById('copy-link-btn');
+      const topBtn = document.getElementById('back-to-top-btn');
+
+      if (shareBtn) {
+        shareBtn.addEventListener('click', async () => {
+          const title = shareBtn.getAttribute('data-title') || document.title;
+          const text = shareBtn.getAttribute('data-desc') || '';
+          const url = window.location.href;
+
+          if (navigator.share) {
+            try {
+              await navigator.share({ title, text, url });
+            } catch (err) {
+              if (err.name !== 'AbortError') console.warn('Share error:', err);
+            }
+          } else {
+            // Fallback: copy link
+            try {
+              await navigator.clipboard.writeText(url);
+              showFeedback(shareBtn, '已复制链接');
+            } catch (copyErr) {
+              console.error('Copy failed:', copyErr);
+            }
+          }
+        });
+      }
+
+      if (copyLinkBtn) {
+        copyLinkBtn.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(window.location.href);
+            showFeedback(copyLinkBtn, '已复制');
+          } catch (err) {
+            console.error('Copy failed:', err);
+          }
+        });
+      }
+
+      if (topBtn) {
+        topBtn.addEventListener('click', () => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+
+      function showFeedback(btn, text) {
+        const span = btn.querySelector('.tool-text');
+        if (!span) return;
+        const originalText = span.textContent;
+        span.textContent = text;
+        btn.classList.add('success');
+        setTimeout(() => {
+          span.textContent = originalText;
+          btn.classList.remove('success');
+        }, 2000);
+      }
+    }
+
+    document.addEventListener('astro:page-load', initShareToolbar);
+  })();
+</script>

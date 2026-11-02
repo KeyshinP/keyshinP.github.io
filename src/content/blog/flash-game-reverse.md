@@ -23,13 +23,23 @@ categories:
 - 还原了依赖绝版实体书才能解锁的全部84道题库答案
 - 输出了可复用的爬虫脚本和答案查询工具
 
+```mermaid
+graph TD
+    Entry["入口 SWF (Loader)"] -->|"静态常量扫描"| Scan["解压 SWF 二进制"]
+    Entry -->|"动态回溯"| Net["Network 依赖链分析"]
+    Scan -->|"序列枚举"| Enumerate["同前缀枚举 (bgm1~bgm30)"]
+    Net -->|"解构验证"| Decompile["FFDec 反编译 BoughtCheck"]
+    Enumerate --> Archive["完整离线资源存档"]
+    Decompile --> Archive
+```
+
 ---
 
 ## 过程中解决的具体问题
 
 ### 问题1：SWF依赖分析
 - **现象**：单独运行入口文件白屏，原因是Flash游戏的加载器模式——入口SWF运行时动态请求其他文件。
-- **解决方式**：分析浏览器 Network 面板，理解 SWF 依赖链结构，确认需要完整下载所有依赖文件。
+- **解决方式**：分析浏览器 Network 面板，理解 SWF 依赖链结构，确认需要完整下载所有依赖文件。针对压缩格式（CWS/ZWS），通过解压率公式 $R = 1 - \frac{S_{\text{compressed}}}{S_{\text{raw}}}$ 校验解压完整度。
 
 ### 问题2：无法知道有哪些文件
 - **现象**：不能靠人工游玩抓包，会遗漏所有未触发的分支（失败结局、隐藏道具等）。

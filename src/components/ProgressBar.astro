@@ -17,12 +17,23 @@
 </style>
 
 <script is:inline>
-  window.addEventListener('scroll', () => {
-    const bar = document.getElementById('reading-progress-bar');
-    if (!bar) return;
-    const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
-    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-    const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
-    bar.style.width = scrolled + '%';
-  }, { passive: true });
+  (() => {
+    function initProgressBar() {
+      const bar = document.getElementById('reading-progress-bar');
+      if (!bar) return;
+
+      const updateProgress = () => {
+        const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+        bar.style.width = scrolled + '%';
+      };
+
+      window.removeEventListener('scroll', updateProgress);
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+    }
+
+    document.addEventListener('astro:page-load', initProgressBar);
+  })();
 </script>

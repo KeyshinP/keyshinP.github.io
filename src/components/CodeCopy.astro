@@ -2,67 +2,177 @@
 ---
 
 <script is:inline>
-  function setupCodeCopyButtons() {
-    const preBlocks = document.querySelectorAll('pre');
-    
-    preBlocks.forEach((pre) => {
-      // Avoid duplicate buttons
-      if (pre.parentElement && pre.parentElement.classList.contains('code-wrapper')) {
-        return;
-      }
-
-      // Create wrapper
-      const wrapper = document.createElement('div');
-      wrapper.className = 'code-wrapper';
-      pre.parentNode.insertBefore(wrapper, pre);
-      wrapper.appendChild(pre);
-
-      // Create copy button
-      const copyBtn = document.createElement('button');
-      copyBtn.className = 'copy-btn';
-      copyBtn.setAttribute('aria-label', '复制代码');
-      copyBtn.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-        </svg>
-        <span>复制</span>
-      `;
-
-      copyBtn.addEventListener('click', async () => {
-        const code = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
-        try {
-          await navigator.clipboard.writeText(code);
-          copyBtn.classList.add('copied');
-          copyBtn.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            <span>已复制</span>
-          `;
-          setTimeout(() => {
-            copyBtn.classList.remove('copied');
-            copyBtn.innerHTML = `
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-              </svg>
-              <span>复制</span>
-            `;
-          }, 2000);
-        } catch (err) {
-          console.error('复制失败:', err);
+  (() => {
+    function setupCodeCopyButtons() {
+      const preBlocks = document.querySelectorAll('.markdown-body pre');
+      
+      preBlocks.forEach((pre) => {
+        // Skip mermaid or already wrapped blocks
+        if (pre.querySelector('code.language-mermaid') || pre.classList.contains('mermaid')) return;
+        if (pre.parentElement && pre.parentElement.classList.contains('code-wrapper')) {
+          return;
         }
+
+        // Determine language
+        const code = pre.querySelector('code');
+        let lang = pre.getAttribute('data-language') || '';
+        if (!lang && code) {
+          const match = code.className.match(/language-([a-zA-Z0-9_\-]+)/);
+          if (match) lang = match[1];
+        }
+        if (!lang && pre.className) {
+          const match = pre.className.match(/lang(?:uage)?-([a-zA-Z0-9_\-]+)/);
+          if (match) lang = match[1];
+        }
+        lang = (lang || 'TEXT').toUpperCase();
+
+        // Create wrapper
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-wrapper';
+        pre.parentNode.insertBefore(wrapper, pre);
+
+        // Create header bar
+        const header = document.createElement('div');
+        header.className = 'code-header';
+        header.innerHTML = `
+          <div class="code-window-controls">
+            <span class="control-dot dot-red"></span>
+            <span class="control-dot dot-yellow"></span>
+            <span class="control-dot dot-green"></span>
+            <span class="code-lang-label">${lang}</span>
+          </div>
+          <button class="copy-btn" aria-label="复制代码">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>复制</span>
+          </button>
+        `;
+
+        const copyBtn = header.querySelector('.copy-btn');
+        copyBtn.addEventListener('click', async () => {
+          const codeText = code ? code.innerText : pre.innerText;
+          try {
+            await navigator.clipboard.writeText(codeText);
+            copyBtn.classList.add('copied');
+            copyBtn.innerHTML = `
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>已复制</span>
+            `;
+            setTimeout(() => {
+              copyBtn.classList.remove('copied');
+              copyBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span>复制</span>
+              `;
+            }, 2000);
+          } catch (err) {
+            console.error('复制失败:', err);
+          }
+        });
+
+        wrapper.appendChild(header);
+        wrapper.appendChild(pre);
       });
+    }
 
-      wrapper.appendChild(copyBtn);
-    });
-  }
-
-  // Run on load and dynamic page changes
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupCodeCopyButtons);
-  } else {
-    setupCodeCopyButtons();
-  }
+    document.addEventListener('astro:page-load', setupCodeCopyButtons);
+  })();
 </script>
+
+<style>
+  :global(.code-wrapper) {
+    position: relative;
+    margin: 1.75rem 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-code);
+    box-shadow: var(--shadow-sm);
+  }
+
+  :global(.code-header) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.85rem;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-color);
+    font-family: var(--font-mono);
+  }
+
+  :global(.code-window-controls) {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  :global(.control-dot) {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  :global(.dot-red) {
+    background: #ff5f56;
+  }
+
+  :global(.dot-yellow) {
+    background: #ffbd2e;
+  }
+
+  :global(.dot-green) {
+    background: #27c93f;
+  }
+
+  :global(.code-lang-label) {
+    margin-left: 0.5rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  :global(.code-wrapper pre) {
+    margin: 0 !important;
+    padding: 1.25rem !important;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    background-color: transparent !important;
+  }
+
+  :global(.code-header .copy-btn) {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  :global(.code-header .copy-btn:hover) {
+    background: var(--accent-light);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  :global(.code-header .copy-btn.copied) {
+    background: #10b981;
+    color: #ffffff;
+    border-color: #10b981;
+  }
+</style>

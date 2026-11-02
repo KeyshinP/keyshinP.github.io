@@ -2,6 +2,8 @@
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TOC from '../../components/TOC.astro';
+import ShareToolbar from '../../components/ShareToolbar.astro';
+import Giscus from '../../components/Giscus.astro';
 import { getReadingStats } from '../../utils/readingTime';
 
 export async function getStaticPaths() {
@@ -21,11 +23,13 @@ export async function getStaticPaths() {
 const { post, prevPost, nextPost } = Astro.props;
 const { Content, headings } = await render(post);
 const stats = getReadingStats(post.body || '');
+const ogImage = `/og/${post.id}.svg`;
 ---
 
 <BaseLayout 
   title={`${post.data.title} - Keyshin`} 
   description={post.data.description}
+  image={ogImage}
   article={true}
   showProgress={true}
 >
@@ -92,6 +96,9 @@ const stats = getReadingStats(post.body || '');
           <Content />
         </div>
 
+        <!-- Share & Interaction Toolbar -->
+        <ShareToolbar title={post.data.title} description={post.data.description} />
+
         <!-- Post Nav: Prev & Next -->
         {(prevPost || nextPost) && (
           <nav class="post-navigation">
@@ -113,6 +120,9 @@ const stats = getReadingStats(post.body || '');
             )}
           </nav>
         )}
+
+        <!-- Giscus Comments -->
+        <Giscus repo="KeyshinP/keyshinP.github.io" />
       </article>
 
       <TOC headings={headings} />
@@ -209,9 +219,7 @@ const stats = getReadingStats(post.body || '');
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
-    margin-top: 4rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border-color);
+    margin-top: 2.5rem;
   }
 
   .nav-card {

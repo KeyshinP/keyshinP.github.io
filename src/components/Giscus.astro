@@ -1,0 +1,99 @@
+---
+interface Props {
+  repo?: string;
+  repoId?: string;
+  category?: string;
+  categoryId?: string;
+}
+
+const {
+  repo = "KeyshinP/keyshinP.github.io",
+  repoId = "",
+  category = "General",
+  categoryId = "",
+} = Astro.props;
+---
+
+<section class="giscus-section" aria-label="文章评论区">
+  <div class="giscus-header">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+    <span>交流与讨论</span>
+  </div>
+
+  <div class="giscus-container">
+    <div class="giscus"></div>
+  </div>
+</section>
+
+<style>
+  .giscus-section {
+    margin-top: 3.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .giscus-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+  }
+
+  .giscus-container {
+    min-height: 200px;
+  }
+</style>
+
+<script is:inline define:vars={{ repo, repoId, category, categoryId }}>
+  (() => {
+    function loadGiscus() {
+      const container = document.querySelector('.giscus');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const isDark = document.documentElement.classList.contains('dark');
+      const script = document.createElement('script');
+      script.src = 'https://giscus.app/client.js';
+      script.setAttribute('data-repo', repo);
+      if (repoId) script.setAttribute('data-repo-id', repoId);
+      script.setAttribute('data-category', category);
+      if (categoryId) script.setAttribute('data-category-id', categoryId);
+      script.setAttribute('data-mapping', 'pathname');
+      script.setAttribute('data-strict', '0');
+      script.setAttribute('data-reactions-enabled', '1');
+      script.setAttribute('data-emit-metadata', '0');
+      script.setAttribute('data-input-position', 'top');
+      script.setAttribute('data-theme', isDark ? 'dark_dimmed' : 'light');
+      script.setAttribute('data-lang', 'zh-CN');
+      script.setAttribute('crossorigin', 'anonymous');
+      script.async = true;
+
+      container.appendChild(script);
+    }
+
+    function syncGiscusTheme() {
+      const iframe = document.querySelector('iframe.giscus-frame');
+      if (!iframe || !iframe.contentWindow) return;
+      const isDark = document.documentElement.classList.contains('dark');
+      iframe.contentWindow.postMessage(
+        { giscus: { setConfig: { theme: isDark ? 'dark_dimmed' : 'light' } } },
+        'https://giscus.app'
+      );
+    }
+
+    document.addEventListener('astro:page-load', loadGiscus);
+
+    // Observe theme toggle button clicks
+    const themeBtn = document.getElementById('theme-toggle');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        setTimeout(syncGiscusTheme, 100);
+      });
+    }
+  })();
+</script>
